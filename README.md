@@ -1,5 +1,5 @@
 # Speedclimbing timer
-## A timing utility for speed climbing
+A timing utility for speed climbing
 
 Using both a microcontroller and a front end computer, this project can be used to accurately measure and display the time needed to top the speed climbing wall.
 
