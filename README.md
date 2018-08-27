@@ -6,7 +6,7 @@ Using both a microcontroller and a front end computer, this project can be used 
 
 ## Features
 - IFSC rule compliant
-- pecise timing
+- precise timing
 - automatic communication between the Arduino and the front end
 
 ## Hardware requirements
