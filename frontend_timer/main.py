@@ -10,9 +10,12 @@ class Main:
         # stuff for the Arduino communication
         self.communication_pin, self.button_pin = 10, 1
         """self.button = lambda: read_gpio(self.button_pin)
-        self.serial = lambda: read_gpio(self.communication_pin)"""
+        self.serial = lambda: read_gpio(self.communication_pin)
+        """
+        # for testing only
         self.button = lambda: True
         self.serial = lambda: False
+        self.result = 0
         # stuff for the display
         self.display = Display()
         # stuff for the timer
@@ -79,13 +82,16 @@ class Main:
 
     def read_result(self):
         if read_gpio(self.communication_pin):
-            self.write(read_serial())
+            self.result = read_serial()
+            self.display.update_scores(self.result)
+            self.write(self.result)
         else:
             self.display.communication_error(self.timer)
         self.change_state(reset)
 
     def reset(self):
         self.display.reset()
+        self.result = 0
         self.change_state(idling)
 
     # fsm loop functions
