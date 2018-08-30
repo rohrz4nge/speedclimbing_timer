@@ -103,6 +103,12 @@ void set_signal(int state) {
   countdown_transitions();
 }
 
+
+void green() {
+  change_signals(0,0,1);
+  change_state(COUNTDOWN_TIMER);
+}
+
 // as a rule, the contestant made a false start, if he lifts his feet within the time of the signa start until 1/10 seconds after the start signal was given
 // this state checks enforces rule
 void countdown_timer() {
@@ -171,7 +177,7 @@ void transitions() {
     case YELLOW:
       set_signal(YELLOW); break;
     case GREEN:
-      set_signal(GREEN); break;
+      green(); break;
     case COUNTDOWN_TIMER:
       countdown_timer(); break;
     case WAITING:
