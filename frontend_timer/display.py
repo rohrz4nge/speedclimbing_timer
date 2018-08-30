@@ -71,6 +71,18 @@ class Display:
         self.time = time
         self.change_text(self.time_text, round(self.safediv(), 2))
 
+    # TODO
+    def abort_timer(self):
+        pass
+
+    # TODO
+    def false_start(self):
+        pass
+
+    # TODO
+    def timeout(self):
+        pass
+
     def reset(self):
         self.update_time(0)
 

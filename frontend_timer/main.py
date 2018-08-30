@@ -1,6 +1,6 @@
 from timer import Timer
 from display import Display
-from arduino_communication import read_gpio, read_serial
+from arduino_communication import read_gpio, read_serial, serial_available
 
 idling, countdown, countdown_timer, waiting, result, reset = 0, 1, 2, 3, 4, 5
 
@@ -16,6 +16,8 @@ class Main:
         self.button = lambda: True
         self.serial = lambda: False
         self.result = 0
+        self.result_dict = {"abort": self.display.abort_timer, "false_start": self.display.false_start,
+                            "timeout": self.display.timeout}
         # stuff for the display
         self.display = Display()
         # stuff for the timer
@@ -81,10 +83,13 @@ class Main:
         self.check_button_serial()
 
     def read_result(self):
-        if read_gpio(self.communication_pin):
+        if serial_available():
             self.result = read_serial()
-            self.display.update_scores(self.result)
-            self.write(self.result)
+            if self.result in self.result_dict:
+                self.result_dict[self.result]()
+            else:
+                self.display.update_scores(self.result)
+                self.write(self.result)
         else:
             self.display.communication_error(self.timer)
         self.change_state(reset)

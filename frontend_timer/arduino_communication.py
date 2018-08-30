@@ -7,6 +7,7 @@ def read_gpio(pin):
 
 
 # TODO
+# function reading the serial, returns a stripped string containing only the result
 def read_serial():
     pass
 

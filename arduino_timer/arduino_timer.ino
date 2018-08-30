@@ -24,7 +24,7 @@
 
 
 /* constant variables */
-const int IDLING = 0, RED = 1, YELLOW = 2, GREEN = 3, COUNTDOWN_TIMER = 4, WAITING = 5, FALSE_START = 6, BLINK = 7, ABORT = 8, TOPPED = 9, RESET = 10;
+const int IDLING = 0, RED = 1, YELLOW = 2, GREEN = 3, COUNTDOWN_TIMER = 4, WAITING = 5, FALSE_START = 6, BLINK = 7, ABORT = 8, TIMED_OUT = 9, TOPPED = 10, RESET = 11;
 const int red_led = 2, yellow_led = 3, green_led = 4, serial_indicator = 5;
 const int button = 11, pad_1 = 12, pad_2 = 13, PAD_THRESHHOLD = 512;
 
@@ -59,10 +59,23 @@ void set_timer(int passed_state) {
 
 /* SERIAL FUNCTIONS */
 
-void send_result() {
+// (given an indicator what to send) this function sends either the result, or other states over serial
+// send_result values: 
+//    -1 == abort, -2 == false_start, -3 = timeout
+void send_result(int send_result = 0) {
   // sending...
   digitalWrite(serial_indicator, HIGH);
-  Serial.println(result);
+  // determining whatto send
+  switch (send_result) {
+    case -1:
+      Serial.println("abort"); break;
+    case -2:
+      Serial.println("false_start"); break;
+    case -3:
+      Serial.println("timout"); break;
+    default:
+      Serial.println(result); break;
+  }
   digitalWrite(serial_indicator, LOW);
 }
 
@@ -123,15 +136,17 @@ void countdown_timer() {
 }
 
 // this state waits until pad_2 or button is pressed
+// since the timer is already started in countdown_timer, the timer isn't started here
 void waiting() {
   if (analogRead(pad_2) > PAD_THRESHHOLD) change_state(TOPPED);
   else if (digitalRead(button)) change_state(ABORT);
+  // if the timer has run for 999 seconds, it gets timed out
+  else if (timer + 99900 < millis()) change_state(TIMED_OUT);
   else prev_state = current_state;
 }
 
 void false_start() {
-  result = 0;
-  send_result();
+  send_result(-2);
   change_state(RESET);
 }
 
@@ -147,8 +162,12 @@ void blinking() {
 }
 
 void aborting() {
-  result = 0;
-  send_result();
+  send_result(-1);
+  change_state(RESET);
+}
+
+void timed_out() {
+  send_result(-3);
   change_state(RESET);
 }
 
