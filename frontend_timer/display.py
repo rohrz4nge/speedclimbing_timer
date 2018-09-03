@@ -40,23 +40,26 @@ class Display:
         self.tk.bind("<Escape>", self.destroy)
         self.tk.bind("f", self.toggle_fullscreen)
 
-    def destroy(self, tk_param):
+    """ binded functions """
+    def destroy(self, tk_param: object):
         self.tk.destroy()
         _exit(1)
 
-    def toggle_fullscreen(self, tk_param):
+    def toggle_fullscreen(self, tk_param: object):
         self.state = not self.state
         self.tk.attributes('-fullscreen', self.state)
 
-    def change_text(self, text_canvas, new_text):
+    """ display functions """
+    # given a canvas and a (formatted) string, this function updates the displayed text of the text_canvas to new_text
+    def change_text(self, text_canvas: int, new_text: str):
         self.text_canvas.itemconfig(text_canvas, text=new_text)
         self.tk.update()
 
     # TODO
-    def communication_error(self, inaccurate_time):
+    def communication_error(self, inaccurate_time: float):
         pass
 
-    def update_scores(self, new_score):
+    def update_scores(self, new_score: float):
         # adding to the last scores
         self.last_5 = self.last_5[:4]
         self.last_5.append(new_score)
@@ -69,9 +72,9 @@ class Display:
         self.change_text(self.best_text, "\n".join(str(i) for i in self.best_5))
 
     # given a time in ns, this function updates the time in the tk window
-    def update_time(self, time):
-        self.time = time
-        self.change_text(self.time_text, round(self.time, 2))
+    def update_time(self, time: float):
+        self.time = round(time, 2)
+        self.change_text(self.time_text, str(self.time))
 
     # TODO
     def abort_timer(self):

@@ -12,7 +12,7 @@ class Timer:
     def start(self):
         self.start_time = monotonic_ns()
 
-    def get_current_time(self):
+    def get_current_time(self) -> int:
         return monotonic_ns() - self.start_time
 
     def countdown_is_over(self, countdown_time):
@@ -21,7 +21,7 @@ class Timer:
     def stop(self):
         self.result = monotonic_ns() - self.start_time
 
-    def get_inaccurate_result(self):
+    def get_inaccurate_result(self) -> int:
         return self.result
 
     def reset(self):

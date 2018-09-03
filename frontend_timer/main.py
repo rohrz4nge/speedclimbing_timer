@@ -27,11 +27,11 @@ class Main:
 
     # function converting ns to seconds
     @staticmethod
-    def safediv(time):
+    def safediv(time: int) -> float:
         return time / 1000000000 if time > 0 else 0
 
     # given a state, this function changes the states accordingly
-    def change_state(self, next_state):
+    def change_state(self, next_state: int):
         self.prev = self.current
         self.current = next_state
 
@@ -56,7 +56,7 @@ class Main:
         else:
             self.same_state()
 
-    def countdown_states(self, countdown_time, next_state):
+    def countdown_states(self, countdown_time: int, next_state: int):
         # initializing timer
         if self.prev != self.current:
             self.timer.start()
