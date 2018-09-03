@@ -11,8 +11,9 @@ Using both a microcontroller and a server, this project can be used to accuratel
 
 ## Hardware requirements
 - Microcontroller compatible with the Arduino IDE (recommendation: NodeMCU)
-- Computer with at least one GPIO pin running Python (recommendation: Raspberry Pi Zero W)
+- Raspberry Pi running Python (recommendation: Raspberry Pi Zero W)
 
 ## Software requirements
 - Python 3.7 or newer
 - pySerial
+- RPI.GPIO

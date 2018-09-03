@@ -1,6 +1,6 @@
 from timer import Timer
 from display import Display
-from arduino_communication import read_gpio, read_serial, serial_available
+from arduino_communication import IO
 
 idling, countdown, countdown_timer, waiting, result, reset = 0, 1, 2, 3, 4, 5
 
@@ -8,16 +8,9 @@ idling, countdown, countdown_timer, waiting, result, reset = 0, 1, 2, 3, 4, 5
 class Main:
     def __init__(self):
         # stuff for the Arduino communication
-        self.communication_pin, self.button_pin = 10, 1
-        """self.button = lambda: read_gpio(self.button_pin)
-        self.serial = lambda: read_gpio(self.communication_pin)
-        """
-        # for testing only
-        self.button = lambda: True
-        self.serial = lambda: False
+        self.serial_port, self.serial_indicator, self.button_pin = "/dev/0", 4, 1
+        self.io = IO(self.serial_port, self.serial_indicator, self.button_pin)
         self.result = 0
-        self.result_dict = {"abort": self.display.abort_timer, "false_start": self.display.false_start,
-                            "timeout": self.display.timeout}
         # stuff for the display
         self.display = Display()
         # stuff for the timer
@@ -25,11 +18,14 @@ class Main:
         self.countdown_time, self.countdown_timer_time = 2000000000, 100000000
         # stuff for the main
         self.database_path = "database.csv"
+        self.result_dict = {"abort": self.display.abort_timer, "false_start": self.display.false_start,
+                            "timeout": self.display.timeout}
         # stuff for the fsm
         self.prev, self.current = 0, 0
         self.states = [self.idling, self.countdown, self.countdown_timer, self.waiting, self.read_result, self.reset]
         self.mainloop()
 
+    # TODO
     # given a result, this function writes the result into a database at self.database_path
     def write(self, accurate_result):
         pass
@@ -44,19 +40,18 @@ class Main:
         self.prev = self.current
 
     def check_button_serial(self):
-        if self.button():
+        if self.io.read_button():
             self.change_state(reset)
-        if self.serial():
+        if self.io.read_serial_indicator():
             self.timer.stop()
             self.change_state(result)
         else:
             self.same_state()
 
-    # states
+    """ States """
 
     def idling(self):
-        if self.button():
-            self.button = lambda: False
+        if self.io.read_button():
             self.change_state(countdown)
         else:
             self.same_state()
@@ -83,8 +78,8 @@ class Main:
         self.check_button_serial()
 
     def read_result(self):
-        if serial_available():
-            self.result = read_serial()
+        if self.io.serial_available():
+            self.result = self.io.read_serial()
             if self.result in self.result_dict:
                 self.result_dict[self.result]()
             else:
@@ -99,7 +94,8 @@ class Main:
         self.result = 0
         self.change_state(idling)
 
-    # fsm loop functions
+    """ loop functions """
+
     # based on the current state index, this function executes the current state
     def transitions(self):
         print(self.current)
@@ -111,4 +107,5 @@ class Main:
             self.transitions()
 
 
-main = Main()
+if __name__ == "__main__":
+    main = Main()

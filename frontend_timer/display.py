@@ -1,4 +1,5 @@
 import tkinter as tk
+from os import _exit
 
 
 class Display:
@@ -13,7 +14,8 @@ class Display:
         self.state = False
         self.tk = tk.Tk()
         self.tk.configure(background=bg_theme)
-        self.text_canvas = tk.Canvas(self.tk, width=window_width, height=window_height, bd=0, background=bg_theme, highlightthickness=0)
+        self.text_canvas = tk.Canvas(self.tk, width=window_width, height=window_height, bd=0, background=bg_theme,
+                                     highlightthickness=0)
         self.text_canvas.pack()
 
         # text fields
@@ -32,11 +34,17 @@ class Display:
                                                       anchor="nw",
                                                       justify="right", font=score_font, fill=fg_theme)
         self.text_canvas.itemconfig(self.last_text, text="1.00\n2.00\n10.00\n100.00\n999.99")
-
-        self.toggle_fullscreen()
+        # self.toggle_fullscreen()
         self.tk.update()
 
-    def toggle_fullscreen(self):
+        self.tk.bind("<Escape>", self.destroy)
+        self.tk.bind("f", self.toggle_fullscreen)
+
+    def destroy(self, tk_param):
+        self.tk.destroy()
+        _exit(1)
+
+    def toggle_fullscreen(self, tk_param):
         self.state = not self.state
         self.tk.attributes('-fullscreen', self.state)
 
@@ -89,3 +97,4 @@ class Display:
 
 if __name__ == '__main__':
     display = Display()
+    display.tk.mainloop()
