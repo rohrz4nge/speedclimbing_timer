@@ -1,5 +1,6 @@
 import serial
 import rpi.gpio as gpio
+import sqlite3
 
 
 class IO:
@@ -12,6 +13,11 @@ class IO:
         gpio.setmode(gpio.BCM)
         gpio.setup(serial_indicator, gpio.IN)
         gpio.setup(button_pin, gpio.IN)
+        # sqlite stuff
+        self.database = sqlite3.connect("speedclimbing_scores.db")
+        self.cursor = self.database.cursor()
+        self.cursor.execute("CREATE TABLE if not exists results(result integer, name text)")
+        self.database.commit()
 
     def read_serial_indicator(self):
         return gpio.input(self.serial_indicator)
@@ -33,3 +39,9 @@ class IO:
         line = self.serial.readline()
         print(line)
         return line
+
+    def write(self, result, name="unknown"):
+        self.cursor.execute("INSERT INTO results VALUES (:result, :name)", {"result": result, "name": name})
+        self.database.commit()
+        # self.cursor.execute("SELECT * FROM results")
+        # print(self.cursor.fetchall())

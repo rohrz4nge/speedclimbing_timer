@@ -68,16 +68,10 @@ class Display:
         self.change_text(self.last_text, "\n".join(str(i) for i in self.last_5))
         self.change_text(self.best_text, "\n".join(str(i) for i in self.best_5))
 
-        # actual gui updates
-
-    # function converting ns to seconds
-    def safediv(self):
-        return self.time / 1000000000 if self.time > 0 else 0
-
     # given a time in ns, this function updates the time in the tk window
     def update_time(self, time):
         self.time = time
-        self.change_text(self.time_text, round(self.safediv(), 2))
+        self.change_text(self.time_text, round(self.time, 2))
 
     # TODO
     def abort_timer(self):

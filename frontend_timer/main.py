@@ -1,6 +1,6 @@
 from timer import Timer
 from display import Display
-from arduino_communication import IO
+from communication import IO
 
 idling, countdown, countdown_timer, waiting, result, reset = 0, 1, 2, 3, 4, 5
 
@@ -25,10 +25,10 @@ class Main:
         self.states = [self.idling, self.countdown, self.countdown_timer, self.waiting, self.read_result, self.reset]
         self.mainloop()
 
-    # TODO
-    # given a result, this function writes the result into a database at self.database_path
-    def write(self, accurate_result):
-        pass
+    # function converting ns to seconds
+    @staticmethod
+    def safediv(time):
+        return time / 1000000000 if time > 0 else 0
 
     # given a state, this function changes the states accordingly
     def change_state(self, next_state):
@@ -80,11 +80,13 @@ class Main:
     def read_result(self):
         if self.io.serial_available():
             self.result = self.io.read_serial()
+            # checking if the result is abort, falsestart or timeout
             if self.result in self.result_dict:
                 self.result_dict[self.result]()
             else:
+                self.result = self.safediv(int(self.result))
                 self.display.update_scores(self.result)
-                self.write(self.result)
+                self.io.write(self.result)
         else:
             self.display.communication_error(self.timer)
         self.change_state(reset)
