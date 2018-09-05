@@ -20,6 +20,7 @@ class Timer:
 
     def stop(self):
         self.result = monotonic_ns() - self.start_time
+        return self.result
 
     def get_inaccurate_result(self) -> int:
         return self.result

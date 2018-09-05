@@ -1,5 +1,5 @@
 import serial
-import rpi.gpio as gpio
+import RPi.GPIO
 import sqlite3
 
 
@@ -10,9 +10,9 @@ class IO:
         self.serial = serial.Serial(serial_port, 9600, timeout=1)
         self.serial.open()
         # gpio stuff
-        gpio.setmode(gpio.BCM)
-        gpio.setup(serial_indicator, gpio.IN)
-        gpio.setup(button_pin, gpio.IN)
+        RPi.GPIO.setmode(RPi.GPIO.BCM)
+        RPi.GPIO.setup(serial_indicator, RPi.GPIO.IN)
+        RPi.GPIO.setup(button_pin, RPi.GPIO.IN)
         # sqlite stuff
         self.database = sqlite3.connect("speedclimbing_scores.db")
         self.cursor = self.database.cursor()
@@ -20,10 +20,10 @@ class IO:
         self.database.commit()
 
     def read_serial_indicator(self) -> bool:
-        return gpio.input(self.serial_indicator)
+        return RPi.GPIO.input(self.serial_indicator)
 
     def read_button(self) -> bool:
-        return gpio.input(self.button_pin)
+        return RPi.GPIO.input(self.button_pin)
 
     # function returning whether a connection over serial was made
     def serial_available(self) -> bool:

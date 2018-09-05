@@ -2,7 +2,7 @@ from timer import Timer
 from display import Display
 from communication import IO
 
-idling, countdown, countdown_timer, waiting, result, reset = 0, 1, 2, 3, 4, 5
+idling, countdown, countdown_timer, waiting, result, false_start, reset = 0, 1, 2, 3, 4, 5, 6
 
 
 class Main:
@@ -18,11 +18,10 @@ class Main:
         self.countdown_time, self.countdown_timer_time = 2000000000, 100000000
         # stuff for the main
         self.database_path = "database.csv"
-        self.result_dict = {"abort": self.display.abort_timer, "false_start": self.display.false_start,
-                            "timeout": self.display.timeout}
+        self.result_dict = {"abort": self.display.abort_timer, "timeout": self.display.timeout}
         # stuff for the fsm
         self.prev, self.current = 0, 0
-        self.states = [self.idling, self.countdown, self.countdown_timer, self.waiting, self.read_result, self.reset]
+        self.states = [self.idling, self.countdown, self.countdown_timer, self.waiting, self.read_result, self.false_start, self.reset]
         self.mainloop()
 
     # function converting ns to seconds
@@ -81,6 +80,8 @@ class Main:
         if self.io.serial_available():
             self.result = self.io.read_serial()
             # checking if the result is abort, falsestart or timeout
+            if self.result == "false_start":
+                self.change_state(false_start)
             if self.result in self.result_dict:
                 self.result_dict[self.result]()
             else:
@@ -88,8 +89,14 @@ class Main:
                 self.display.update_scores(self.result)
                 self.io.write(self.result)
         else:
-            self.display.communication_error(self.timer)
+            self.display.communication_error(self.timer.stop())
         self.change_state(reset)
+
+    def false_start(self):
+        if self.display.false_start():
+            self.change_state(reset)
+        elif self.io.read_button():
+            self.change_state(reset)
 
     def reset(self):
         self.display.reset()
